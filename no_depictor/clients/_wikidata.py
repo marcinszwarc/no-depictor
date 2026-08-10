@@ -1,12 +1,13 @@
+from ._mediawiki import MediaWikiAPI
 from ..data import CategoryDescriptor
 from requests import Session
 
-class WikidataAPI:
+class WikidataAPI(MediaWikiAPI):
 
-    def __init__(self, session: Session = Session()):
-        self.httpSession = session
+    def __init__(self, session: Session | None = None):
+        super().__init__(apiUrl='https://www.wikidata.org/w/api.php', session=session)
 
-    
+
     def hasImageClaim(self, qId: str, repeatable=True) -> bool:
         requestParams = {
             'action': 'wbgetentities',
@@ -16,7 +17,7 @@ class WikidataAPI:
         }
 
         rawResponse = self.httpSession.get(
-            'https://www.wikidata.org/w/api.php',
+            self.apiUrl,
             params=requestParams,
             timeout=60,
         )

@@ -1,12 +1,13 @@
+from ._mediawiki import MediaWikiAPI
+from ..data import FileDescriptor
 from requests import Session
 from typing import Iterator
-from ..data import FileDescriptor
 
 
-class CommonsAPI:
+class CommonsAPI(MediaWikiAPI):
     
-    def __init__(self, session: Session = Session()):
-        self.httpSession = session
+    def __init__(self, session: Session | None = None):
+        super().__init__(apiUrl='https://commons.wikimedia.org/w/api.php', session=session)
 
 
     def getFilesNotDepictingSubject(self, categoryName: str, qId: str, wholeCategory: bool = False) -> Iterator[FileDescriptor]:
@@ -22,7 +23,7 @@ class CommonsAPI:
 
         while True:
             rawResponse = self.httpSession.get(
-                'https://commons.wikimedia.org/w/api.php',
+                self.apiUrl,
                 params=requestParams,
                 timeout=60,
             )

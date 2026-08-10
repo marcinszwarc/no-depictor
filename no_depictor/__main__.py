@@ -40,8 +40,17 @@ def main():
         wikidata = WikidataAPI(session)
         petscan = PetScan(session)
         depictor = Depictor(args['user'], args['sessid'], session)
+
+        user = args.get('botpw_user')
+        passwd = args.get('botpw_pass')
+        if user and passwd:
+            commons.login(user, passwd)
+            wikidata.login(user, passwd)
     except KeyboardInterrupt:
         console.print('[bold red]Interrupted by user.')
+        sys.exit(1)
+    except Exception as e:
+        console.print(f'[bold red]Error during initialization: {escape(str(e))}')
         sys.exit(1)
 
     logPath = args.get('logfile', 'no_depictor.log')

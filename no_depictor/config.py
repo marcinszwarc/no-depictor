@@ -15,6 +15,8 @@ def getConfig(console: Console):
     parser.add_argument('--user', type=str, help='Username for Depictor API')
     parser.add_argument('--sessid', type=str, help='PHP session ID for Depictor API')
     parser.add_argument('--config', type=str, help='Path to the configuration file, set to "-" to disable')
+    parser.add_argument('--botpw_user', type=str, help='Username to log in as for API high limits')
+    parser.add_argument('--botpw_pass', type=str, help='Password to log in with for API high limits')
     parser.add_argument('--dry-run', action='store_true', help='Perform a dry run without making any changes')
 
     args = parser.parse_args()
@@ -92,6 +94,9 @@ def _askUserForMissingArgs(allArgs: dict, cliArgs: Namespace, console: Console) 
             console=console
         ) or 'no_depictor.log'
 
+    if _absent('botpw_user', cliArgs):
+        _askForBotPassword(allArgs, console)
+
     if not allArgs.get('dry_run', False):
         allArgs['dry_run'] = False
 
@@ -126,6 +131,28 @@ def _askForCategory(allArgs: dict, console: Console):
             console=console
         )
         allArgs['categoryfile'] = None
+
+
+def _askForBotPassword(allArgs: dict, console: Console):
+    wantsBotPassword = Confirm.ask(
+        'Do you want to provide a bot password for higher API limits?',
+        default=allArgs.get('botpw_user') is not None,
+        console=console
+    )
+    if wantsBotPassword:
+        allArgs['botpw_user'] = Prompt.ask(
+            'MediaWiki BotPassword username (typically user@bp_name)',
+            default=allArgs.get('botpw_user', ''),
+            console=console
+        )
+        REUSE_LAST = 'reuse last'
+        botpw_pass = Prompt.ask(
+            'Bot password',
+            default=REUSE_LAST if allArgs.get('botpw_pass') is not None else None,
+            console=console
+        )
+        if botpw_pass != REUSE_LAST:
+            allArgs['botpw_pass'] = botpw_pass
 
 
 def _absent(key: str, cliArgs: Namespace) -> bool:
