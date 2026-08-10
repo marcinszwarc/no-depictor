@@ -46,6 +46,7 @@ def main():
         if user and passwd:
             commons.login(user, passwd)
             wikidata.login(user, passwd)
+            console.print(f'[green]Logged in to Commons and Wikidata as {user} for higher API limits.[/green]')
     except KeyboardInterrupt:
         console.print('[bold red]Interrupted by user.')
         sys.exit(1)
