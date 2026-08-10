@@ -162,7 +162,7 @@ def doWorkForUndoneCategories(
         status.update(status=f'Searching for files not depicting subject {qId} in {catlink(catName)}')
         try:
             files = list(commons.getFilesNotDepictingSubject(catName, qId))
-            undoneFiles = depictor.getUndoneFiles(files)
+            undoneFiles = depictor.getUndoneFiles(files, category)
         except Exception as e:
             console.print(f'[red]Failed to fetch files for {catlink(catName)}:[/red] {escape(str(e))}')
             logToFile(logFile, 'ERROR', f'Failed to fetch files for {catlink(catName, False)}: {str(e)}')

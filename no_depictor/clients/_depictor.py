@@ -39,10 +39,11 @@ class Depictor:
         ]
 
 
-    def getUndoneFiles(self, files: list[FileDescriptor]) -> list[FileDescriptor]:
+    def getUndoneFiles(self, files: list[FileDescriptor], category: CategoryDescriptor) -> list[FileDescriptor]:
         requestParams = {
             'action': 'files-exists',
             'mids': [ file.mId for file in files ],
+            'qid': category.qId,
         }
 
         response = self.httpSession.post(
