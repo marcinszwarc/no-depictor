@@ -18,6 +18,7 @@ def getConfig(console: Console):
     parser.add_argument('--botpw_user', type=str, help='Username to log in as for API high limits')
     parser.add_argument('--botpw_pass', type=str, help='Password to log in with for API high limits')
     parser.add_argument('--dry-run', action='store_true', help='Perform a dry run without making any changes')
+    parser.add_argument('--interval', type=float, help='Interval between save requests to Depictor API in seconds (default: 0.5, or 0 in dry-run)')
 
     args = parser.parse_args()
     combinedArgs = { key: getattr(args, key, None) for key in vars(args) }

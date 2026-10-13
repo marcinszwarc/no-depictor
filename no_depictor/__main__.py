@@ -62,6 +62,15 @@ def main():
         console.print(f'[bold red]Failed to open log file `{logPath}` for writing: {e}')
         sys.exit(1)
 
+    dryRun = args.get('dry_run', False)
+    if dryRun:
+        console.print('[yellow]Dry run mode enabled. No changes will be made.[/yellow]')
+        logToFile(logFile, 'INFO', 'Dry run mode enabled. No changes will be made.')
+
+    interval = args.get('interval', -1)
+    if interval is None or interval < 0:
+        interval = 0 if dryRun else 0.5
+
     with console.status('Initializing') as status, InterruptHandler() as ih:
         for rootCategory in interruptible(rootCategories, ih):
             if '|' in rootCategory:
@@ -114,7 +123,18 @@ def main():
 
             console.print(f'Found {len(undoneCategories)} categories not done in Depictor.')
             logToFile(logFile, 'INFO', f'Found {len(undoneCategories)} categories not done in Depictor.')
-            doWorkForUndoneCategories(undoneCategories, commons, depictor, wikidata, status, console, ih, logFile, args.get('dry_run', False))
+            doWorkForUndoneCategories(
+                undoneCategories,
+                commons,
+                depictor,
+                wikidata,
+                status,
+                console,
+                ih,
+                logFile,
+                dryRun,
+                interval
+            )
     
     logToFile(logFile, 'INFO', 'Finished execution.')
     logFile.close()
@@ -144,7 +164,8 @@ def doWorkForUndoneCategories(
         console: Console,
         ih: InterruptHandler,
         logFile: TextIOWrapper,
-        dryRun: bool = False
+        dryRun: bool = False,
+        sleepInterval: float = 0.5
     ):
     for category in interruptible(undoneCategories, ih):
         qId, catName = category
@@ -185,7 +206,7 @@ def doWorkForUndoneCategories(
                 logToFile(logFile, 'ERROR', f'Failed to mark {pagelink(fileName, False)} ({mId}) as not depicting {qId}: {str(e)}')
             
             try:
-                sleep(0.5) # To avoid overloading the server
+                sleep(sleepInterval) # To avoid overloading the server
             except KeyboardInterrupt:
                 ih.forceInterrupt() # Just in case if SIGINT gets somehow missed
 
